@@ -33,7 +33,7 @@ INDEX_HTML := $(OUT_DIR)/index.html
 all: sync $(HTML_FILES) index
 
 # 出力ディレクトリを作ってから pandoc 変換
-$(OUT_DIR)/%.html: $(SRC_DIR)/%.md $(CSS_FILE)
+$(OUT_DIR)/%.html: $(SRC_DIR)/%.md $(CSS_FILE) Makefile
 	@mkdir -p $(dir $@)
 	$(PANDOC) $(PANDOC_OPTS) -o $@ $<
 
@@ -42,7 +42,7 @@ index: sync $(INDEX_HTML)
 
 sync: $(SOURCE_SET_STAMP)
 
-$(INDEX_HTML): $(HTML_FILES) $(CSS_FILE) | $(OUT_DIR)
+$(INDEX_HTML): $(HTML_FILES) $(CSS_FILE) Makefile | $(OUT_DIR)
 	@find "$(OUT_DIR)" -type f -name '*.html' ! -name 'index.html' | \
 		while IFS= read -r html_file; do \
 			relative="$${html_file#$(OUT_DIR)/}"; \
