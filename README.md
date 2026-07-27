@@ -21,9 +21,12 @@ macOS/Linux向けの小さなツールです。
 ├── assets/
 │   └── pandoc.css
 ├── .gitignore
+├── LICENSE
 ├── Makefile
 ├── README.md
-└── nisshi.sh
+├── nisshi.sh
+└── tests/
+    └── test.sh
 ```
 
 `nisshi.sh`を直接実行するか、PATHが通ったディレクトリから
@@ -110,3 +113,13 @@ make serve PORT=3000
 ```sh
 make clean
 ```
+
+## テスト
+
+一時ディレクトリ内でテストを実行します。実際の日記や生成物は変更しません。
+
+```sh
+make test
+```
+
+ShellCheckがインストールされている場合は、テスト内で自動的に実行されます。

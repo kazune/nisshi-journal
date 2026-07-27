@@ -29,7 +29,7 @@ INDEX_MD := $(OUT_DIR)/index.md
 INDEX_HTML := $(OUT_DIR)/index.html
 
 
-.PHONY: all clean index serve sync
+.PHONY: all clean index serve sync test
 all: sync $(HTML_FILES) index
 
 # 出力ディレクトリを作ってから pandoc 変換
@@ -98,6 +98,9 @@ $(OUT_DIR):
 
 serve: all
 	$(PYTHON) -m http.server "$(PORT)" --bind 127.0.0.1 --directory "$(OUT_DIR)"
+
+test:
+	./tests/test.sh
 
 clean:
 	$(RM) -r $(OUT_DIR)
