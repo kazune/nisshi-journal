@@ -109,6 +109,11 @@ make -C "$test_project" >/dev/null
 
 rm "$test_project/src/2020/01/02.md"
 make -C "$test_project" >/dev/null
+assert_file "$test_project/site/2020/01/02.html"
+assert_contains "$test_project/site/index.md" "2020/01/02.html"
+
+make -C "$test_project" clean >/dev/null
+make -C "$test_project" >/dev/null
 assert_no_file "$test_project/site/2020/01/02.html"
 assert_not_contains "$test_project/site/index.md" "2020/01/02.html"
 assert_contains "$test_project/site/index.md" "2020/01/03.html"

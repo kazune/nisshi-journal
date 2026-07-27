@@ -21,16 +21,14 @@ PANDOC_OPTS := \
 MD_FILES := $(sort $(shell if [ -d "$(SRC_DIR)" ]; then find "$(SRC_DIR)" -type f -name '*.md'; fi))
 # 出力先の .html（site/ 以下にミラー）
 HTML_FILES := $(patsubst $(SRC_DIR)/%.md,$(OUT_DIR)/%.html,$(MD_FILES))
-SOURCE_SET_ID := $(shell printf '%s\n' $(MD_FILES) | cksum | awk '{print $$1 "-" $$2}')
-SOURCE_SET_STAMP := $(OUT_DIR)/.sources-$(SOURCE_SET_ID)
 
 # index
 INDEX_MD := $(OUT_DIR)/index.md
 INDEX_HTML := $(OUT_DIR)/index.html
 
 
-.PHONY: all clean index serve sync test
-all: sync $(HTML_FILES) index
+.PHONY: all clean index serve test
+all: $(HTML_FILES) index
 
 # 出力ディレクトリを作ってから pandoc 変換
 $(OUT_DIR)/%.html: $(SRC_DIR)/%.md $(CSS_FILE) Makefile
@@ -38,19 +36,9 @@ $(OUT_DIR)/%.html: $(SRC_DIR)/%.md $(CSS_FILE) Makefile
 	$(PANDOC) $(PANDOC_OPTS) -o $@ $<
 
 # index.md 自動生成
-index: sync $(INDEX_HTML)
-
-sync: $(SOURCE_SET_STAMP)
+index: $(INDEX_HTML)
 
 $(INDEX_HTML): $(HTML_FILES) $(CSS_FILE) Makefile | $(OUT_DIR)
-	@find "$(OUT_DIR)" -type f -name '*.html' ! -name 'index.html' | \
-		while IFS= read -r html_file; do \
-			relative="$${html_file#$(OUT_DIR)/}"; \
-			source_file="$(SRC_DIR)/$${relative%.html}.md"; \
-			if [ ! -f "$$source_file" ]; then \
-				$(RM) "$$html_file"; \
-			fi; \
-		done
 	@echo "# Journal Index" > $(INDEX_MD)
 	@echo "" >> $(INDEX_MD)
 	@find $(OUT_DIR) -type f -name '*.html' \
@@ -87,11 +75,6 @@ $(INDEX_HTML): $(HTML_FILES) $(CSS_FILE) Makefile | $(OUT_DIR)
 					day, weekday_name[weekday + 1], $$0; \
 			}' >> $(INDEX_MD)
 	$(PANDOC) $(PANDOC_OPTS) -o $(INDEX_HTML) $(INDEX_MD)
-
-$(SOURCE_SET_STAMP): | $(OUT_DIR)
-	@$(RM) "$(OUT_DIR)"/.sources-*
-	@$(RM) "$(INDEX_HTML)"
-	@touch "$@"
 
 $(OUT_DIR):
 	@mkdir -p "$@"

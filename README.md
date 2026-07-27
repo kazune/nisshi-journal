@@ -93,8 +93,12 @@ Markdownは`src/YYYY/MM/DD.md`、HTMLは`site/YYYY/MM/DD.html`に置かれます
 索引は`site/index.html`です。CSSは各HTMLへ埋め込まれるため、HTML単体でも
 表示できます。
 
-変更されたMarkdownだけが再生成されます。Markdownを削除して`make`すると、
-対応するHTMLと索引項目も削除されます。
+変更されたMarkdownだけが再生成されます。Markdownを削除した場合は、
+対応するHTMLと索引項目を削除するため、明示的に再構築してください。
+
+```sh
+make clean && make
+```
 
 ローカルサーバーで確認する場合は次を実行します。
 
