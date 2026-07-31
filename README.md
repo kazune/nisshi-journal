@@ -10,7 +10,7 @@ macOS/Linux向けの小さなツールです。
 - Pandoc 3.x
 - 任意のテキストエディタ（未設定時はVim）
 - Python 3（`make serve`を使う場合）
-- `xdg-open`（Linuxで`nisshi open`を使う場合）
+- `xdg-open`（Linuxで`nisshi open`を使う場合。WSLでは`explorer.exe`を使用）
 
 ## セットアップ
 
@@ -87,6 +87,8 @@ nisshi --help
 `edit`、`touch`、`get`、`getpath`で日付を省略すると、今日の日付を
 使用します。`open`で日付を省略した場合は索引を開きます。指定できる
 日付は2000年1月1日から今日までの実在する日付です。
+WSLでは`explorer.exe`でWindows側の関連付けを使用し、それ以外のLinuxでは
+`xdg-open`でHTMLを開きます。
 
 初回の動作は、日記の作成、HTMLの生成、索引の表示を順に実行して
 確認できます。

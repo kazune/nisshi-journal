@@ -108,17 +108,28 @@ createfile_if_not_exist() {
 make_html() {
 	cd "$1" && make
 }
+is_wsl() {
+	[ -n "${WSL_INTEROP:-}" ] ||
+		grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null
+}
 open_html() {
 	case "$(uname -s)" in
 		Darwin)
 			open "$1"
 			;;
 		Linux)
-			if ! command -v xdg-open >/dev/null 2>&1; then
-				echo "Error($LINENO)[$(basename "$0")] : xdg-open is required" >&2
+			if is_wsl &&
+				command -v explorer.exe >/dev/null 2>&1 &&
+				command -v wslpath >/dev/null 2>&1; then
+				local windows_path
+				windows_path="$(wslpath -w "$1")"
+				explorer.exe "$windows_path"
+			elif command -v xdg-open >/dev/null 2>&1; then
+				xdg-open "$1"
+			else
+				echo "Error($LINENO)[$(basename "$0")] : explorer.exe or xdg-open is required" >&2
 				return 1
 			fi
-			xdg-open "$1"
 			;;
 		*)
 			echo "Error($LINENO)[$(basename "$0")] : unsupported operating system" >&2

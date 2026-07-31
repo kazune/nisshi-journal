@@ -24,6 +24,10 @@ assert_not_contains() {
 	fi
 }
 
+assert_equals() {
+	[ "$1" = "$2" ] || fail "expected '$1', got '$2'"
+}
+
 script_dir="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 project_root="$(cd -P -- "$script_dir/.." && pwd)"
 test_root="$(mktemp -d "${TMPDIR:-/tmp}/nisshi-test.XXXXXX")"
@@ -45,6 +49,29 @@ cp -R "$project_root/assets" "$test_project/"
 
 make -C "$test_project" >/dev/null
 assert_file "$test_project/site/index.html"
+
+mock_bin="$test_root/mock-bin"
+open_log="$test_root/open.log"
+mkdir -p "$mock_bin"
+cat <<-'MOCK' > "$mock_bin/uname"
+	#!/bin/sh
+	printf '%s\n' Linux
+MOCK
+cat <<-'MOCK' > "$mock_bin/wslpath"
+	#!/bin/sh
+	printf '%s\n' 'C:\nisshi\site\index.html'
+MOCK
+cat <<-'MOCK' > "$mock_bin/explorer.exe"
+	#!/bin/sh
+	printf '%s\n' "$1" > "$OPEN_LOG"
+MOCK
+cat <<-'MOCK' > "$mock_bin/xdg-open"
+	#!/bin/sh
+	printf '%s\n' xdg-open > "$OPEN_LOG"
+MOCK
+chmod +x "$mock_bin/uname" "$mock_bin/wslpath" "$mock_bin/explorer.exe" "$mock_bin/xdg-open"
+WSL_INTEROP=1 OPEN_LOG="$open_log" PATH="$mock_bin:$PATH" "$test_project/nisshi.sh" open
+assert_equals 'C:\nisshi\site\index.html' "$(cat "$open_log")"
 
 "$test_project/nisshi.sh" touch 20200102
 "$test_project/nisshi.sh" touch 20200103
