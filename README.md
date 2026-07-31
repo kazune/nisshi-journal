@@ -7,7 +7,7 @@ macOS/Linux向けの小さなツールです。
 
 - Bash
 - GNU Make
-- Pandoc 3.x
+- Pandoc 2.x以降
 - 任意のテキストエディタ（未設定時はVim）
 - Python 3（`make serve`を使う場合）
 - `xdg-open`（Linuxで`nisshi open`を使う場合。WSLでは`explorer.exe`を使用）

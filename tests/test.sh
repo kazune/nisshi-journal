@@ -47,6 +47,38 @@ test_project="$(cd -P -- "$test_project" && pwd)"
 cp "$project_root/Makefile" "$project_root/nisshi.sh" "$test_project/"
 cp -R "$project_root/assets" "$test_project/"
 
+mock_pandoc="$test_root/mock-pandoc"
+cat <<-'MOCK' > "$mock_pandoc"
+	#!/bin/sh
+	if [ "${1:-}" = "--help" ]; then
+		if [ "${MOCK_EMBED_RESOURCES:-false}" = "true" ]; then
+			printf '%s\n' '--embed-resources'
+		fi
+		exit 0
+	fi
+MOCK
+chmod +x "$mock_pandoc"
+
+modern_plan="$(MOCK_EMBED_RESOURCES=true make -C "$test_project" -n PANDOC="$mock_pandoc")"
+case "$modern_plan" in
+	*"--embed-resources"*) ;;
+	*) fail "Pandoc 2.19 or later did not use --embed-resources" ;;
+esac
+case "$modern_plan" in
+	*"--self-contained"*) fail "Pandoc 2.19 or later used --self-contained" ;;
+	*) ;;
+esac
+
+legacy_plan="$(MOCK_EMBED_RESOURCES=false make -C "$test_project" -n PANDOC="$mock_pandoc")"
+case "$legacy_plan" in
+	*"--self-contained"*) ;;
+	*) fail "Pandoc 2.18 or earlier did not use --self-contained" ;;
+esac
+case "$legacy_plan" in
+	*"--embed-resources"*) fail "Pandoc 2.18 or earlier used --embed-resources" ;;
+	*) ;;
+esac
+
 make -C "$test_project" >/dev/null
 assert_file "$test_project/site/index.html"
 

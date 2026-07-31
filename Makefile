@@ -12,9 +12,15 @@ OUT_DIR := site
 CSS_FILE := assets/pandoc.css
 
 # pandoc オプション（必要に応じて調整）
+PANDOC_EMBED_OPT := $(shell \
+	if $(PANDOC) --help 2>/dev/null | grep -q -- '--embed-resources'; then \
+		printf '%s' '--embed-resources'; \
+	else \
+		printf '%s' '--self-contained'; \
+	fi)
 PANDOC_OPTS := \
 	-s \
-	--embed-resources \
+	$(PANDOC_EMBED_OPT) \
 	-c $(CSS_FILE)
 
 # 変換対象の .md（README と 年/月/日を含む）
